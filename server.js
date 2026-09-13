@@ -185,6 +185,13 @@ io.on('connection', socket => {
     socket.to(code).emit('base_state', Array.isArray(state) ? state : []);
   });
 
+
+  socket.on('repair_state', state => {
+    const code = socketRoom.get(socket.id);
+    const room = rooms.get(code);
+    if (!room || room.hostSocketId !== socket.id || !state) return;
+    socket.to(code).emit('repair_state', state);
+  });
   socket.on('wall_event', evt => {
     const code = socketRoom.get(socket.id);
     const room = rooms.get(code);
