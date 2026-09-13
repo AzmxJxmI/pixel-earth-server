@@ -1,6 +1,6 @@
 {
   "name": "pixel-earth-multiplayer-server",
-  "version": "1.0.0",
+  "version": "4.0.0",
   "private": true,
   "description": "Room relay and host-authoritative multiplayer server for Pixel Earth",
   "main": "server.js",
