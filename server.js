@@ -199,6 +199,21 @@ io.on('connection', socket => {
     socket.to(code).emit('wall_event', evt);
   });
 
+  // Host-only targeted events let the authoritative simulation return
+  // diplomacy/trade outcomes to one specific player without broadcasting
+  // private UI prompts to the whole room.
+  socket.on('host_client_event', evt => {
+    const code = socketRoom.get(socket.id);
+    const room = rooms.get(code);
+    if (!room || room.hostSocketId !== socket.id || !evt) return;
+    const target = String(evt.targetSocketId || '');
+    if (!target || !room.players.has(target)) return;
+    io.to(target).emit('client_event', {
+      type: String(evt.type || '').slice(0, 40),
+      payload: evt.payload && typeof evt.payload === 'object' ? evt.payload : {}
+    });
+  });
+
   socket.on('disconnect', () => leaveCurrentRoom(socket, 'disconnected'));
 });
 
