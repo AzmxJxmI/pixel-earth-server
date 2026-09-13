@@ -1,8 +1,8 @@
 {
   "name": "pixel-earth-multiplayer-server",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
-  "description": "Pixel Earth multiplayer V5: true non-host player parity and hard AI ownership locks",
+  "description": "Pixel Earth multiplayer V6: authoritative territory sync, true human-player context isolation, and render/performance fixes",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

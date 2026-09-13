@@ -186,7 +186,7 @@ function restoreSession(socket, room, sessionId, suppliedName, ack = () => {}) {
   return true;
 }
 
-app.get('/', (req, res) => res.type('text').send('Pixel Earth multiplayer server V4 is online.'));
+app.get('/', (req, res) => res.type('text').send('Pixel Earth multiplayer server V6 is online.'));
 app.get('/health', (req, res) => res.json({ ok: true, rooms: rooms.size, reconnectGraceMs: RECONNECT_GRACE_MS }));
 
 io.on('connection', socket => {
@@ -308,11 +308,25 @@ io.on('connection', socket => {
     });
   });
 
-  socket.on('capture_batch', captures => {
+  socket.on('capture_batch', payload => {
     const code = socketRoom.get(socket.id);
     const room = rooms.get(code);
-    if (!room || room.hostSocketId !== socket.id || !Array.isArray(captures) || !captures.length) return;
-    socket.to(code).emit('capture_batch', captures.slice(0, 5000));
+    if (!room || room.hostSocketId !== socket.id) return;
+
+    const rows = Array.isArray(payload)
+      ? payload
+      : (Array.isArray(payload?.rows) ? payload.rows : []);
+    if (!rows.length) return;
+
+    const safeRows = rows.slice(0, 5000);
+    const firstRev = Number(safeRows[0]?.[0]) || 0;
+    const lastRev = Number(safeRows[safeRows.length - 1]?.[0]) || firstRev;
+
+    socket.to(code).emit('capture_batch', {
+      fromRev: Number(payload?.fromRev) || firstRev,
+      toRev: Number(payload?.toRev) || lastRev,
+      rows: safeRows
+    });
   });
   socket.on('small_state', state => {
     const code = socketRoom.get(socket.id);
@@ -359,5 +373,5 @@ io.on('connection', socket => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Pixel Earth multiplayer V5 listening on port ${PORT}`);
+  console.log(`Pixel Earth multiplayer V6 listening on port ${PORT}`);
 });
