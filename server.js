@@ -259,9 +259,20 @@ io.on('connection', socket => {
     }
 
     player.countryId = countryId;
-    ack({ ok: true, countryId });
+
+    // HARD REAL-PLAYER OWNERSHIP LOCK: tell the host before the guest receives
+    // the successful selection callback. This stops host AI from getting another
+    // development tick on the newly claimed country.
+    if (room.hostSocketId && room.hostSocketId !== socket.id) {
+      io.to(room.hostSocketId).emit('human_country_lock', {
+        countryId,
+        socketId: socket.id,
+        name: player.name
+      });
+    }
     broadcastRoomState(room);
     if (room.hostSocketId) io.to(room.hostSocketId).emit('human_country_changed', roomState(room));
+    ack({ ok: true, countryId });
   });
 
   socket.on('request_snapshot', () => {
@@ -348,5 +359,5 @@ io.on('connection', socket => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Pixel Earth multiplayer V4 listening on port ${PORT}`);
+  console.log(`Pixel Earth multiplayer V5 listening on port ${PORT}`);
 });

@@ -1,8 +1,8 @@
 {
   "name": "pixel-earth-multiplayer-server",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "private": true,
-  "description": "Room relay and host-authoritative multiplayer server for Pixel Earth",
+  "description": "Pixel Earth multiplayer V5: true non-host player parity and hard AI ownership locks",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
